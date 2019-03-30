@@ -10,9 +10,9 @@ import ru.home.geekbrains.java.core_03.pak03.Orange;
  */
 public class App {
 
-    public static void main(String[] args) throws NoSuchFieldException {
+    public static void main(String[] args) {
 
-        System.out.println("run tests");
+        System.out.println("run tests on package ru.home.geekbrains.java.core_03 ");
     }
 
 }
