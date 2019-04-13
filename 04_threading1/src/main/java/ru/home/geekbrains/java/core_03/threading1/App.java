@@ -30,7 +30,7 @@ public class App {
 
         Tpool pool = new Tpool();
 
-        String input = "ABCABCABCABC";
+        String input = "ABCABCABCABCABC";
 
         pool.printLine(input);
     }
