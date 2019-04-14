@@ -18,18 +18,26 @@ public class App {
     static final int CARS_COUNT = 4;
 
 
-//    private static AtomicReference<Car> atomicWinner = new AtomicReference<>();
+    private static AtomicReference<Car> atomicWinner = new AtomicReference<>(null);
 
     private static String[] messages = new String[] {
             "ВАЖНОЕ ОБЪЯВЛЕНИЕ >>> Подготовка!!!",
             "ВАЖНОЕ ОБЪЯВЛЕНИЕ >>> Гонка началась!!!",
             "ВАЖНОЕ ОБЪЯВЛЕНИЕ >>> Гонка закончилась!!!"};
 
-    private static ReentrantLock finishLock = new ReentrantLock();
-    private static Car winner = null;
+    //private static ReentrantLock finishLock = new ReentrantLock();
+    //private static Car winner = null;
 
 
     public static void main(String[] args) {
+
+        new App();
+    }
+
+
+
+    App() {
+
 
         Phaser phaser = new Phaser() {
             protected boolean onAdvance(int phase, int parties) {
@@ -54,12 +62,11 @@ public class App {
             carList.add(new Car(race,
                     ThreadLocalRandom.current().nextInt(20, 30),
                     i,
+                    this::finish,
                     phaser));
 
             carList.get(i).registerOnRace();
         }
-
-
 
         for (Car car : carList) {
             new Thread(car).start();
@@ -71,36 +78,18 @@ public class App {
 
 
         // phase 2 - finish
-        phaser.arriveAndAwaitAdvance();
+        phaser.arriveAndDeregister();
 
 
     }
 
 
-    static void finish(Car car) {
+    void finish(Car car) {
 
-        try {
-            finishLock.lock();
+        boolean res =  atomicWinner.compareAndSet(null, car);
 
-            if (winner == null) {
-                winner = car;
-                System.out.println("WINNER: " + car.getName());
-            }
-        }
-        finally {
-            finishLock.unlock();
-        }
-
-
-
-
-//        atomicWinner.getAndAccumulate(car, (previous, x) -> {
-//
-//            if (previous == null)
-//                System.out.println("WINNER: " + car.getName());
-//            return previous == null ? x : previous;
-//
-//        });
+        if (res)
+            System.out.println("WINNER: " + car.getName());
     }
 
 

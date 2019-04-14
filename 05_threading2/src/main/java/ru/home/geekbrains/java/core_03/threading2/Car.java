@@ -1,14 +1,16 @@
 package ru.home.geekbrains.java.core_03.threading2;
 
-
 import java.util.concurrent.Phaser;
+import java.util.function.Consumer;
 
 public class Car implements Runnable {
 
     private Race race;
     private int speed;
     private String name;
+    private Consumer<Car> onFinish;
     private Phaser phaser;
+
 
     String getName() {
         return name;
@@ -17,10 +19,11 @@ public class Car implements Runnable {
         return speed;
     }
 
-    Car(Race race, int speed, int no, Phaser phaser) {
+    Car(Race race, int speed, int no, Consumer<Car> onFinish, Phaser phaser) {
         this.race = race;
         this.speed = speed;
         this.name = "Участник #" + no;
+        this.onFinish = onFinish;
         this.phaser = phaser;
     }
 
@@ -47,7 +50,8 @@ public class Car implements Runnable {
             race.get(i).go(this);
         }
 
-        App.finish(this);
+
+        onFinish.accept(this);
 
         // Сход с трассы на финише
         phaser.arriveAndDeregister();
