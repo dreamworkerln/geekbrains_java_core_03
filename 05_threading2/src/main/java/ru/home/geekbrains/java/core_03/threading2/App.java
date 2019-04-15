@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.IntUnaryOperator;
 
 /**
@@ -17,9 +18,6 @@ public class App {
 
     static final int CARS_COUNT = 4;
 
-
-    private static AtomicReference<Car> atomicWinner = new AtomicReference<>(null);
-
     private static String[] messages = new String[] {
             "ВАЖНОЕ ОБЪЯВЛЕНИЕ >>> Подготовка!!!",
             "ВАЖНОЕ ОБЪЯВЛЕНИЕ >>> Гонка началась!!!",
@@ -27,6 +25,8 @@ public class App {
 
     //private static ReentrantLock finishLock = new ReentrantLock();
     //private static Car winner = null;
+
+    private AtomicReference<Car> atomicWinner = new AtomicReference<>(null);
 
 
     public static void main(String[] args) {
@@ -37,7 +37,6 @@ public class App {
 
 
     App() {
-
 
         Phaser phaser = new Phaser() {
             protected boolean onAdvance(int phase, int parties) {

@@ -7,7 +7,7 @@ import static ru.home.geekbrains.java.core_03.threading2.App.CARS_COUNT;
 
 public class Tunnel extends Stage {
 
-    private static Semaphore tunnelSemaphore = new Semaphore(CARS_COUNT / 2, true);
+    private Semaphore tunnelSemaphore = new Semaphore(CARS_COUNT / 2, true);
 
     public Tunnel() {
         this.length = 80;
