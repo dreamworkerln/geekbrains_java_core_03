@@ -29,7 +29,7 @@ public class App
 
     public static int[] arrayExtractor(int[] arr) {
 
-        log.traceEntry("Parameters: {}", arr);
+        log.traceEntry("Parameters: {}", Arrays.toString(arr));
 
         int[] result  = null;
 
@@ -47,9 +47,10 @@ public class App
         if (index == -1) {
             throw new IllegalArgumentException("Illegal input " + Arrays.toString(arr));
         }
-        index++;
 
-        log.traceExit(result);
+        result = Arrays.copyOfRange(arr, index + 1, arr.length);
+
+        log.traceExit(Arrays.toString(result));
 
         return result;
     }
@@ -100,8 +101,9 @@ public class App
 
         //log = Logger.getLogger(MethodHandles.lookup().lookupClass());
 
-        log.info("\n\n\n\n===================================================================================================");
-
+        log.info("\n\n\n\n ===================================================================================================");
+        log.info("START");
+        log.info("===================================================================================================\n");
     }
 
 
