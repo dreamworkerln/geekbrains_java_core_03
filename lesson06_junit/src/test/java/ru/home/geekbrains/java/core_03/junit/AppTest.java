@@ -1,11 +1,16 @@
 package ru.home.geekbrains.java.core_03.junit;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +23,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  */
 
 class AppTest {
+
+    private static Logger log;
+
+    @BeforeAll
+    static void setup() {
+        App.setupLog4j();
+        log = LogManager.getLogger(MethodHandles.lookup().lookupClass());
+        log.info("@BeforeAll - executes once before all test methods in this class");
+    }
 
     @BeforeEach
     void setUp() {}
@@ -59,7 +73,7 @@ class AppTest {
                             () -> App.arrayExtractor(arg),
                             "Should be exception here");
 
-            System.out.println(thrown.toString());
+            log.throwing(Level.TRACE, thrown);
         }
         else {
             assertArrayEquals(expected, App.arrayExtractor(arg));

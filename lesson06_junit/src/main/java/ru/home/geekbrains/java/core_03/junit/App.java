@@ -3,7 +3,10 @@ package ru.home.geekbrains.java.core_03.junit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 /**
@@ -14,6 +17,7 @@ public class App
 {
 
     private static Logger log;
+    private static boolean isLog4jLoaded = false;
 
     static {
         setupLog4j();
@@ -89,13 +93,26 @@ public class App
     }
 
 
-    private static void setupLog4j() {
+    public static void setupLog4j() {
 
-        String path_tmp = System.getProperty("user.dir") + "/" + "log/";
+        // crutches
+        if(isLog4jLoaded)
+            return;
+
+        String path = System.getProperty("user.dir") + "/" + "log/";
+
+
+          // log4j походу сам умеет создвавать пути к лог-файлам
+        
+//        if (!Files.exists(Paths.get(path))) {
+//            try { Files.createDirectories(Paths.get(path));}
+//            catch (IOException e) { throw new RuntimeException(e);}
+//        }
+
         // DONT CALL LOGGERS BEFORE *.folder.path SET BELOW
-        System.setProperty("debug.folder.path", path_tmp + "debug.log");
-        System.setProperty("info.folder.path", path_tmp + "info.log");
-        System.setProperty("error.folder.path", path_tmp + "error.log");
+        System.setProperty("debug.folder.path", path + "debug.log");
+        System.setProperty("info.folder.path", path + "info.log");
+        System.setProperty("error.folder.path", path + "error.log");
 
         log = LogManager.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -104,6 +121,8 @@ public class App
         log.info("\n\n\n\n ===================================================================================================");
         log.info("START");
         log.info("===================================================================================================\n");
+
+        isLog4jLoaded = true;
     }
 
 
