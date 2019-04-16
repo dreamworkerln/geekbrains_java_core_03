@@ -34,7 +34,10 @@ class AppTest {
     }
 
     @BeforeEach
-    void setUp() {}
+    void setUp() {
+        //log.info("@BeforeEach - executes before each test method in this class");
+
+    }
 
     @AfterEach
     void tearDown() {}
