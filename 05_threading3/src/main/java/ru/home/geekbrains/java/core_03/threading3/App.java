@@ -63,14 +63,14 @@ public class App
 
     public static double TICK_TIME = 100.0;
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
 
         new App();
     }
     
     
 
-    App() throws InterruptedException {
+    App()  {
 
 
 

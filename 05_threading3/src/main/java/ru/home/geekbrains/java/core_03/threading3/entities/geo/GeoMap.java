@@ -26,9 +26,9 @@ public class GeoMap {
 
         // Порт загрузки
         Port port = new Port("Порт Поставка");
-        port.getDockList().add(new Terminal(ProductType.AMMUNITION));
-        port.getDockList().add(new Terminal(ProductType.FUEL));
-        port.getDockList().add(new Terminal(ProductType.CONSTRUCTION_MATERIALS));
+        port.getDockList().add(new Terminal(1, ProductType.AMMUNITION));
+        port.getDockList().add(new Terminal(2, ProductType.FUEL));
+        port.getDockList().add(new Terminal(3, ProductType.CONSTRUCTION_MATERIALS));
         //
         port.getGoods().put(ProductType.AMMUNITION, 8021);
         port.getGoods().put(ProductType.FUEL, 6580);
@@ -39,8 +39,8 @@ public class GeoMap {
 
         // Порт разгрузки
         port = new Port("Порт Прием");
-        for (int i = 0; i < 99; i++) {
-            port.getDockList().add(new Terminal(true));
+        for (int i = 1; i < 100; i++) {
+            port.getDockList().add(new Terminal(i, true));
         }
         port.getGoods().put(ProductType.AMMUNITION, 0);
         port.getGoods().put(ProductType.FUEL, 0);

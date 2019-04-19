@@ -161,7 +161,7 @@ public class Ship implements Runnable {
 
                 // Если терминал отгружает данный тип товара и он есть в наличии в порту
                 if (d.getAmount(cargoType) > 0) {
-                    supportedDockList.put(d.getApproximateQueueLength(), d);
+                    supportedDockList.put(d.getQueueLength(), d);
                 }
             }
 
@@ -221,7 +221,7 @@ public class Ship implements Runnable {
 
                 // Если терминал загружает данный тип товара
                 if (d.getProductTypeSet().contains(cargoType)) {
-                    supportedDockList.put(d.getApproximateQueueLength(), d);
+                    supportedDockList.put(d.getQueueLength(), d);
                 }
             }
 

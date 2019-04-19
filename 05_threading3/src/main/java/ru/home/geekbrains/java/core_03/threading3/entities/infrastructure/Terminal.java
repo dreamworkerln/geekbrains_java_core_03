@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static ru.home.geekbrains.java.core_03.threading3.App.TICK_TIME;
 
@@ -13,17 +14,21 @@ import static ru.home.geekbrains.java.core_03.threading3.App.TICK_TIME;
  */
 public class Terminal {
 
+    private int id;
     private Set<ProductType> typeSet = new HashSet<>();
     private Semaphore semaphore = new Semaphore(1);
+    private AtomicInteger atomicInteger = new AtomicInteger(0);
     private Port owner;
+
 
 
     /**
      * Create dock with specified single goods type terminal
      * @param type ProductType
      */
-    public Terminal(ProductType type) {
+    public Terminal(int id, ProductType type) {
         typeSet.add(type);
+        this.id = id;
     }
 
 
@@ -31,11 +36,12 @@ public class Terminal {
      * Create dock with all/none goods type terminal
      * @param all boolean
      */
-    public Terminal(boolean all) {
+    public Terminal(int id, boolean all) {
 
         if (all) {
             typeSet.addAll(Arrays.asList(ProductType.values()));
         }
+        this.id = id;
     }
 
 
@@ -80,10 +86,12 @@ public class Terminal {
 //    }
 
 
-
-    public int getApproximateQueueLength() {
-        return semaphore.getQueueLength();
+    public int getId() {
+        return id;
     }
+
+    public int getQueueLength() {
+        return atomicInteger.get();}
 
 
     public int getAmount(ProductType productType) {
@@ -96,6 +104,8 @@ public class Terminal {
         }
         return result;
     }
+
+
 
 
     /**
@@ -113,20 +123,21 @@ public class Terminal {
 
             System.out.println(
                     "Ship '" + shipName + "' awaiting at terminal '" +
-                    owner.getName() + "' "+  typeSet.toString());
+                    owner.getName() + "'-" + id + " " +  typeSet.toString());
 
             semaphore.acquire();
+            atomicInteger.incrementAndGet();
 
             int available = owner.getGoods().get(productType);
             amount = Math.min(amount, available);
             available -= amount;
             owner.getGoods().put(productType, available);
             System.out.println(
-                    "Terminal '" + owner.getName() + "' " +  typeSet.toString() +
+                    "Terminal '" + owner.getName() + "'-" + id + " " + typeSet.toString() +
                     " serving ship '" + shipName + "'");
             Thread.sleep((long) (TICK_TIME * amount/100));
             System.out.println(
-                    "Terminal '" + owner.getName() + "' " +  typeSet.toString() +
+                    "Terminal '" + owner.getName() + "'-" + id + " " + typeSet.toString() +
                     " send " + productType.toString() + ": " +
                     amount + " to '" + shipName + "' Current: " + available);
 
@@ -134,6 +145,7 @@ public class Terminal {
             e.printStackTrace();
         }
         finally {
+            atomicInteger.decrementAndGet();
             semaphore.release();
         }
 
@@ -158,19 +170,20 @@ public class Terminal {
 
             System.out.println(
                     "Ship '" + shipName + "' awaiting at terminal '" +
-                    owner.getName() + "' "+  typeSet.toString());
+                    owner.getName() + "'-" + id + " " + typeSet.toString());
 
             semaphore.acquire();
+            atomicInteger.incrementAndGet();
 
             int available = owner.getGoods().get(productType);
             available += amount;
             owner.getGoods().put(productType, available);
             System.out.println(
-                    "Terminal '" + owner.getName() + "' " +  typeSet.toString() +
+                    "Terminal '" + owner.getName() + "'-" + id + " " + typeSet.toString() +
                     " serving ship '" + shipName + "'");
             Thread.sleep((long) (TICK_TIME * amount / 100));
             System.out.println(
-                    "Terminal '" + owner.getName()+ "' " +  typeSet.toString() +
+                    "Terminal '" + owner.getName() + "'-" + id + " " + typeSet.toString() +
                     " received " + productType.toString() + ": "
                     + amount + " from '" + shipName + "' Current: " + available);
 
@@ -178,6 +191,7 @@ public class Terminal {
             e.printStackTrace();
         }
         finally {
+            atomicInteger.decrementAndGet();
             semaphore.release();
         }
     }
