@@ -71,20 +71,13 @@ public class Ship implements Runnable {
     @Override
     public void run() {
 
-
-
-        Iterator<Segment> it;
-        Segment segment;
-
         while(onAssignment) {
 
-            it = cruise.list.iterator();
-            while(it.hasNext()) {
-                // process segment
-                segment = it.next();
+            for (Segment segment : cruise.list) {
                 segHandle.get(segment).accept(segment);
             }
         }
+        
         System.out.println("Ship '" + name + "' dismissed");
     }
 
