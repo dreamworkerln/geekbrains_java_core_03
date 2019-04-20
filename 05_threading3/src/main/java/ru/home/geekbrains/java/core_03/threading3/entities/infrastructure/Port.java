@@ -9,7 +9,7 @@ public class Port {
 
     private ConcurrentMap<ProductType,Integer> goods = new ConcurrentHashMap<>();
 
-    private DockList dockList = new DockList(this);
+    private TerminalList terminalList = new TerminalList(this);
 
     public Port(String name) {
         this.name = name;
@@ -20,8 +20,8 @@ public class Port {
         return name;
     }
 
-    public DockList getDockList() {
-        return dockList;
+    public TerminalList getTerminalList() {
+        return terminalList;
     }
 
     public ConcurrentMap<ProductType, Integer> getGoods() {

@@ -5,9 +5,9 @@ import ru.home.geekbrains.java.core_03.threading3.entities.cruise.segment.Segmen
 import ru.home.geekbrains.java.core_03.threading3.entities.cruise.segment.Task;
 import ru.home.geekbrains.java.core_03.threading3.entities.geo.Channel;
 import ru.home.geekbrains.java.core_03.threading3.entities.geo.Harbor;
-import ru.home.geekbrains.java.core_03.threading3.entities.geo.Nav;
+import ru.home.geekbrains.java.core_03.threading3.entities.geo.Geo;
 import ru.home.geekbrains.java.core_03.threading3.entities.infrastructure.Terminal;
-import ru.home.geekbrains.java.core_03.threading3.entities.infrastructure.DockList;
+import ru.home.geekbrains.java.core_03.threading3.entities.infrastructure.TerminalList;
 import ru.home.geekbrains.java.core_03.threading3.entities.infrastructure.ProductType;
 
 import java.util.*;
@@ -24,10 +24,10 @@ public class Ship implements Runnable {
     private ProductType cargoType; // тип груза, перевозимого кораблем (перманентен, зависит от типа корабля)
 
     private Cruise cruise;         // segment list
-    boolean onAssignment;
+    private boolean onAssignment;
 
     // segment handler list
-    private Map<Segment, Consumer<Segment>> segHandle = new HashMap<>();
+    private Map<Segment, Consumer<Segment>> router = new HashMap<>();
 
 
     public Ship(String name, int maxTonnage, ProductType cargoType,  Cruise cruise) {
@@ -74,11 +74,12 @@ public class Ship implements Runnable {
         while(onAssignment) {
 
             for (Segment segment : cruise.list) {
-                segHandle.get(segment).accept(segment);
+                router.get(segment).accept(segment);
+                if(!onAssignment) break;
             }
         }
-        
-        System.out.println("Ship '" + name + "' dismissed");
+
+        System.out.println("Ship '" + name + "' DISMISSED");
     }
 
 
@@ -90,46 +91,41 @@ public class Ship implements Runnable {
         for(Segment seg : cruise.list) {
 
             // just sail
-            if (seg.getNav() instanceof Channel) {
-                segHandle.put(seg, this::passChannel);
+            if (seg.getGeo() instanceof Channel) {
+                router.put(seg, this::passChannel);
                 continue;
             }
 
             // currentTonnage cargo
             if (seg.getTask() == Task.LOAD) {
-                segHandle.put(seg, this::loadCargo);
+                router.put(seg, this::loadCargo);
                 continue;
             }
 
             // unload cargo
             if (seg.getTask() == Task.UNLOAD) {
-                segHandle.put(seg, this::unloadCargo);
+                router.put(seg, this::unloadCargo);
             }
         }
-
-
     }
 
 
 
     private void passChannel(Segment segment) {
 
-        Nav nav = null;
+        Geo geo = segment.getGeo();
         try {
 
-            nav = segment.getNav();
-
-            nav.enter(name);
+            geo.enter(name); // Входим в пролив
 
             // moving
-            Thread.sleep((long) (TICK_TIME * nav.getLength() / speed()));
-
+            Thread.sleep((long) (TICK_TIME * geo.getLength() / speed()));
         }
         catch (Exception e) {
             e.printStackTrace();
         }
         finally {
-            nav.leave(name);
+            geo.leave(name); // Выходим их пролив
         }
     }
 
@@ -139,57 +135,68 @@ public class Ship implements Runnable {
 
     private void loadCargo(Segment segment) {
 
-        Nav nav = null;
+        Geo geo = segment.getGeo();
 
         try {
 
-            nav = segment.getNav();
-
-            nav.enter(name);
+            geo.enter(name); // Входим в гавань
 
             // moving to terminal
-            Thread.sleep((long) (TICK_TIME * nav.getLength() / 2 / speed()));
+            Thread.sleep((long) (TICK_TIME * geo.getLength() / 2 / speed()));
 
+            // check if requested material is available in port
+            if (((Harbor) geo).getPort().getGoods().get(cargoType) > 0) {
 
-            // get dock list
-            DockList dockList = ((Harbor) nav).getPort().getDockList();
+                // get dock list
+                TerminalList terminalList = ((Harbor) geo).getPort().getTerminalList();
 
-            // find appropriate dock
-            NavigableMap<Integer, Terminal> supportedDockList = new TreeMap<>();
+                // find appropriate dock
+                NavigableMap<Integer, Terminal> supportedDockList = new TreeMap<>();
 
-            for (Terminal d : dockList) {
+                for (Terminal d : terminalList) {
 
-                // Если терминал отгружает данный тип товара и он есть в наличии в порту
-                if (d.getAmount(cargoType) > 0) {
-                    supportedDockList.put(d.getQueueLength(), d);
+                    // Если терминал отгружает данный тип товара и он есть в наличии в порту
+                    // (пока ждали могли растащить)
+                    if (d.getAmount(cargoType) > 0) {
+                        supportedDockList.put(d.getQueueLength(), d);
+                    }
                 }
-            }
 
+                if (supportedDockList.size() > 0) {
 
-            if (supportedDockList.size() > 0) {
+                    // Get the first (maybe) free terminal
+                    Terminal terminal = supportedDockList.firstEntry().getValue();
 
-                // Get the first (maybe) free terminal
-                Terminal terminal = supportedDockList.firstEntry().getValue();
+                    // Load cargo
+                    int received = terminal.get(cargoType, maxTonnage - currentTonnage, name);
+                    currentTonnage += received;
+                }
+                else {
+                    onAssignment = false;
 
-                // Load cargo
-                int received = terminal.get(cargoType, maxTonnage - currentTonnage, name);
-                currentTonnage += received;
+                }
+
             }
             else {
                 onAssignment = false;
-                System.out.println("Ship '" + name + "' can't find appropriate terminal to load cargo " + cargoType + ". Sailing home.");
+            }
+
+            // logging no material
+            if (!onAssignment) {
+                String materialNotAvailable =
+                        "Ship '" + name + "' can't find appropriate terminal to load cargo " +
+                        cargoType + ". Sailing home.";
+                System.out.println(materialNotAvailable);
             }
 
             // moving out harbor
-            Thread.sleep((long) (TICK_TIME * nav.getLength() / 2 / speed()));
-
-
+            Thread.sleep((long) (TICK_TIME * geo.getLength() / 2 / speed()));
         }
         catch (Exception e) {
             e.printStackTrace();
         }
         finally {
-            nav.leave(name);
+            geo.leave(name); // Выходим из гавани
         }
     }
 
@@ -199,25 +206,22 @@ public class Ship implements Runnable {
 
     private void unloadCargo(Segment segment) {
 
-        Nav nav = null;
+        Geo geo = segment.getGeo();
 
         try {
 
-            nav = segment.getNav();
-
-            nav.enter(name);
-
+            geo.enter(name); // Входим в гавань
 
             // moving to terminal
-            Thread.sleep((long) (TICK_TIME * nav.getLength() / 2 / speed()));
+            Thread.sleep((long) (TICK_TIME * geo.getLength() / 2 / speed()));
 
             // get dock list
-            DockList dockList = ((Harbor) nav).getPort().getDockList();
+            TerminalList terminalList = ((Harbor) geo).getPort().getTerminalList();
 
             // find appropriate dock
             NavigableMap<Integer, Terminal> supportedDockList = new TreeMap<>();
 
-            for (Terminal d : dockList) {
+            for (Terminal d : terminalList) {
 
                 // Если терминал загружает данный тип товара
                 if (d.getProductTypeSet().contains(cargoType)) {
@@ -241,59 +245,15 @@ public class Ship implements Runnable {
             }
 
 
-            // moving harbor
-            Thread.sleep((long) (TICK_TIME * nav.getLength() / 2 / speed()));
+            // moving out of harbor
+            Thread.sleep((long) (TICK_TIME * geo.getLength() / 2 / speed()));
 
         }
         catch (Exception e) {
             e.printStackTrace();
         }
         finally {
-            nav.leave(name);
+            geo.leave(name); // Выходим из гавани
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
-
-
-
-
-
-
-
-//        for(Map.Entry<Nav, Consumer<Nav>> entry : segHandle.entrySet()) {
-//
-//
-//        }
-
-
-

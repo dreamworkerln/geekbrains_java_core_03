@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class DockList implements Iterable<Terminal> {
+public class TerminalList implements Iterable<Terminal> {
 
     private Port owner = null;
 
     private List<Terminal> list = new ArrayList<>();
 
 
-    public DockList(Port owner) {
+    public TerminalList(Port owner) {
         this.owner = owner;
     }
 

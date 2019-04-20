@@ -66,26 +66,6 @@ public class Terminal {
         return typeSet.contains(productType);
     }
 
-//    @Override
-//    public void enter() {
-//
-//        try {
-//            semaphore.acquire();
-//            System.out.println("Entering: " + this.getClass().getSimpleName());
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//
-//
-//    @Override
-//    public void leave() {
-//
-//        System.out.println("Leaving: " + this.getClass().getSimpleName());
-//    }
-
-
     public int getId() {
         return id;
     }

@@ -8,7 +8,7 @@ import java.util.concurrent.Semaphore;
 /**
  * Канал с ограничением числа одновременно находящихся в нем судов
  */
-public class Channel extends Nav implements Semaphorable {
+public class Channel extends Geo implements Semaphorable {
 
     private Semaphore semaphore = null;
 
@@ -33,12 +33,12 @@ public class Channel extends Nav implements Semaphorable {
 
 
     @Override
-    public void enter(String name) {
+    public void enter(String shipName) {
 
         try {
             if (semaphore!= null)
                 semaphore.acquire();
-            super.enter(name);
+            super.enter(shipName);
 
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -49,10 +49,10 @@ public class Channel extends Nav implements Semaphorable {
     
 
     @Override
-    public void leave(String name) {
+    public void leave(String shipName) {
         if (semaphore!= null)
             semaphore.release();
-        super.leave(name);
+        super.leave(shipName);
     }
 
 }

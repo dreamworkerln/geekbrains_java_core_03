@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Main-Class: ru.home.geekbrains.java.core_03.threading3.App
+

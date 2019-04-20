@@ -15,8 +15,6 @@ public class ShipFactory {
 
     static class StringGen {
 
-
-        // class variable
         final String lexicon = "ABCDEFGHIJKLMNOPQRSTUVWXYZ12345674890";
         final java.util.Random rand = new java.util.Random();
 
@@ -70,16 +68,15 @@ public class ShipFactory {
 
         ProductType[] cargoTypeList = ProductType.values();
 
-        // возможно не создаст к-то тип корабля и тогда соответствующий товар не будет перевезен
         int j = 0;
         for (int i = 0; i < count; i++) {
 
             // DEBUG
-            int rndI = ThreadLocalRandom.current().nextInt(0, cargoTypeList.length);
+            //int rndI = ThreadLocalRandom.current().nextInt(0, cargoTypeList.length);
 
+            // round robin cargo type
             result.add(createRandom(cargoTypeList[j], route));
 
-            // DEBUG
             j = j < cargoTypeList.length -1 ? ++j : 0;
         }
 

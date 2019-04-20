@@ -7,7 +7,7 @@ import ru.home.geekbrains.java.core_03.threading3.entities.infrastructure.Port;
 /**
  * Гавань, может иметь порт
  */
-public class Harbor extends Nav {
+public class Harbor extends Geo {
 
     private Port port = null;
 
@@ -24,9 +24,4 @@ public class Harbor extends Nav {
         return port;
     }
 
-    //
-//
-//    public void setPort(Port port) {
-//        this.port = port;
-//    }
 }

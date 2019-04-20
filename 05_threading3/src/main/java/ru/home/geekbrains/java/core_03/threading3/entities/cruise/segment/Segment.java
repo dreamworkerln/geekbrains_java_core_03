@@ -1,18 +1,18 @@
 package ru.home.geekbrains.java.core_03.threading3.entities.cruise.segment;
 
-import ru.home.geekbrains.java.core_03.threading3.entities.geo.Nav;
+import ru.home.geekbrains.java.core_03.threading3.entities.geo.Geo;
 
 public class Segment {
-    private Nav nav;
+    private Geo geo;
     private Task task;
 
-    public Segment(Nav nav, Task task) {
-        this.nav = nav;
+    public Segment(Geo geo, Task task) {
+        this.geo = geo;
         this.task = task;
     }
 
-    public Nav getNav() {
-        return nav;
+    public Geo getGeo() {
+        return geo;
     }
 
     public Task getTask() {

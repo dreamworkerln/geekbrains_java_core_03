@@ -2,8 +2,8 @@ package ru.home.geekbrains.java.core_03.threading3.entities.cruise;
 
 import ru.home.geekbrains.java.core_03.threading3.entities.cruise.segment.Segment;
 import ru.home.geekbrains.java.core_03.threading3.entities.cruise.segment.TaskEntry;
+import ru.home.geekbrains.java.core_03.threading3.entities.geo.Geo;
 import ru.home.geekbrains.java.core_03.threading3.entities.geo.GeoMap;
-import ru.home.geekbrains.java.core_03.threading3.entities.geo.Nav;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +26,12 @@ public class Cruise  {
 
         for(TaskEntry te : route) {
 
-            Nav nav = GeoMap.map.get(te.getNavName());
+            Geo geo = GeoMap.map.get(te.getNavName());
 
-            if(nav == null)
+            if(geo == null)
                 throw new IllegalArgumentException("Unknown destination: " + te.getNavName());
 
-            result.list.add(new Segment(nav, te.getTask()));
+            result.list.add(new Segment(geo, te.getTask()));
         }
 
         return result;
