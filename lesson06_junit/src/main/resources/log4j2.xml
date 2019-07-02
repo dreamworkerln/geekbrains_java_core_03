@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="WARN">
+    <Appenders>
+
+        <Console name="Stdout" target="SYSTEM_OUT">
+            <ThresholdFilter level="TRACE" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="%m%n %throwable{suffix()}"/>
+        </Console>
+
+        <File name="DebugLog" fileName="${sys:debug.folder.path}">
+            <ThresholdFilter level="TRACE" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c{1}.%M:%L] %m%n%n %throwable{suffix()}"/>
+            <!--<PatternLayout pattern="%-4r %d{${datestamp}} [%t] %-5level %logger{36} - %msg%n"/>-->
+        </File>
+
+        <File name="InfoLog" fileName="${sys:info.folder.path}">
+            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="%m%n %throwable{suffix()}"/>
+        </File>
+
+        <File name="ErrorLog" fileName="${sys:error.folder.path}">
+            <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c{1}.%M:%L] %m%n%n %throwable{suffix()}"/>
+        </File>
+
+    </Appenders>
+
+    <Loggers>
+
+        <Root level="TRACE">
+            <AppenderRef ref="Stdout" />
+            <AppenderRef ref="DebugLog" />
+            <AppenderRef ref="InfoLog" />
+            <AppenderRef ref="ErrorLog" />
+        </Root>
+
+        <!--DISABLED-->
+        <Logger name="org.apache.http" level="ERROR">
+        </Logger>
+
+        <Logger name="org.springframework.web" level="ERROR">
+        </Logger>
+
+    </Loggers>
+
+</configuration>
